@@ -1,0 +1,3 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+NODE_PATH="$DIR/src" node "$DIR/src/main.js"

@@ -1,0 +1,10 @@
+{
+  "name": "EnigmaBot",
+  "version": "0.1.0",
+  "description": "ENIGMA Discord bot",
+  "main": "main.js",
+  "author": "Josh Ventura",
+  "dependencies": {
+    "discord.js": "^11.4.2"
+  }
+}
