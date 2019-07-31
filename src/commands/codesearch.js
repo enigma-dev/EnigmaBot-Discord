@@ -212,7 +212,9 @@ function assemble_url(args, mgr) {
   if (args.length > 0) {
     file_predicates = []
     for (let i = 0; i < args.length; ++i) {
-      file_predicates.push(searcher(args[i], casesens));
+      src = searcher(args[i], casesens);
+      if (src.ok) file_predicates.push(src.value);
+      else return src.error;
     }
     mgr.file_predicates = file_predicates;
     mgr.search_predicates = [];
@@ -235,19 +237,31 @@ function assemble_url(args, mgr) {
 }
 
 function searcher(regexp, match_case) {
-  const re = new RegExp(regexp, match_case ? '' : 'i');
-  return arg => arg.match(re);
+  try {
+    const re = new RegExp(regexp, match_case ? '' : 'i');
+    return { "ok": true, "value": arg => arg.match(re) };
+  } catch(e) {
+    return {
+      "ok": false,
+      "error": 'Error evaluating "' + regexp + '": ' + e.message
+    };
+  }
 }
 
 function fun_grep(args, mgr) {
   [args, casesens] = CaseSensitive(args)
-  file_predicates = [];
-  search_predicates = [];
+  let file_predicates = [];
+  let search_predicates = [];
   for (let i = 0; i < args.length; ++i) {
-    if (args[i][0] == 'f' && args[i][1] == ':')
-      file_predicates.push(searcher(args[i].substr(2), casesens));
-    else
-      search_predicates.push(searcher(args[i], casesens));
+    if (args[i][0] == 'f' && args[i][1] == ':') {
+      src = searcher(args[i].substr(2), casesens);
+      if (src.ok) file_predicates.push(src.value);
+      else return src.error;
+    } else {
+      src = searcher(args[i], casesens);
+      if (src.ok) search_predicates.push(src.value);
+      else return src.error;
+    }
   }
   mgr.file_predicates = file_predicates;
   mgr.search_predicates = search_predicates;
